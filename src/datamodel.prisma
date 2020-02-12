@@ -1,0 +1,58 @@
+type Jurisdiccion {
+  id: ID! @id @unique
+  nombre: String!
+  localidades: [Localidad!]! @relation(name: "LocalidadesAJurisdiccion", onDelete: CASCADE) 
+}
+
+type Localidad {
+  id: ID! @id @unique
+  nombre: String!
+  organismos: [Organismo!]! @relation(name: "OrganismosALocalidad", onDelete: CASCADE)
+  expedientes: [Expediente!]! @relation(name: "ExpedientesALocalidad", onDelete: CASCADE)
+  secretarias: [Secretaria!]! @relation(name: "SecretariasALocalidad", onDelete: CASCADE)
+  jurisdiccion: Jurisdiccion! @relation(name: "LocalidadesAJurisdiccion", onDelete: SET_NULL)
+}
+
+type Organismo {
+  id: ID! @id @unique
+  nombre: String!
+  localidad: Localidad! @relation(name: "OrganismosALocalidad", onDelete: SET_NULL)
+  secretarias: [Secretaria!]! @relation(name: "SecretariasAOrganismo", onDelete: CASCADE)
+  expedientes: [Expediente!]! @relation(name: "ExpedientesAOrganismo", onDelete: CASCADE)
+}
+
+type Secretaria {
+  id: ID! @id @unique
+  nombre: String!
+  localidad: Localidad! @relation(name: "SecretariasALocalidad", onDelete: SET_NULL)
+  organismo: Organismo! @relation(name: "SecretariasAOrganismo", onDelete: SET_NULL)
+  expedientes: [Expediente!]! @relation(name: "ExpedientesASecretaria", onDelete: CASCADE)
+}
+
+type Expediente {
+  id: ID! @id @unique
+  numero: Int!
+  anio: Int!
+  caratula: String
+  linkCaratulaActual: String
+  linksCaratulas: [String!] @scalarList(strategy: RELATION)
+  estado: String
+  fechaIngreso: DateTime
+  fechaUltimaActuacion: DateTime
+  extractoUltimaActuacion: String
+  ubicacionActual: String
+  localidad: Localidad! @relation(name: "ExpedientesALocalidad", onDelete: SET_NULL)
+  organismo: Organismo! @relation(name: "ExpedientesAOrganismo", onDelete: SET_NULL)
+  secretaria: Secretaria @relation(name: "ExpedientesASecretaria", onDelete: SET_NULL)
+  providencias: [Providencia!]! @relation(name: "ProvidenciasAExpediente", onDelete: CASCADE)
+}
+
+type Providencia {
+  id: ID! @id @unique
+  contenido: String!
+  extracto: String!
+  firmadaPor: String!
+  fechaDeActuacion: DateTime!
+  expediente: Expediente! @relation(name: "ProvidenciasAExpediente", onDelete: SET_NULL)
+}
+

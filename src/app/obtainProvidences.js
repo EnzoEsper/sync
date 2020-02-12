@@ -16,24 +16,25 @@ const obtainCaseFileHeader = require("./obtainCaseFileHeader");
 const obtainProvidencesLinks = require("./obtainProvidencesLinks");
 const obtainDateCurrentLocation = require("./obtainDateCurrentLocation");
 
-const obtainProvidences = async cookie => {
+const obtainProvidences = async (
+  cookie,
+  { number, id, numberOfProvidences, court, linkCurrentCover, linksCovers },
+  localityID,
+  cbo
+) => {
   const client = new GraphQLClient("http://localhost:4466");
 
-  const localityCaseFilesBuffer = fs.readFileSync(
-    `../caseFilesWithNotifications/Capital.json`
-  );
-  const localityCaseFilesJSON = localityCaseFilesBuffer.toString();
-  const localityCaseFilesData = JSON.parse(localityCaseFilesJSON);
+  console.log("...............................");
+  console.log("TRATANDO EXPEDIENTE NUMERO:", number);
+  console.log("...............................");
 
-  let localityID = localityCaseFilesData.id;
-  let caseFileNumber = localityCaseFilesData.caseFiles[0].number;
-  let caseFileID = localityCaseFilesData.caseFiles[0].id;
-  let caseFileNumberOfProvidences =
-    localityCaseFilesData.caseFiles[0].numberOfProvidences;
-  let caseFileCourt = localityCaseFilesData.caseFiles[0].court;
-  let caseFileLinkCurrentCoverDB =
-    localityCaseFilesData.caseFiles[0].linkCurrentCover;
-  let caseFileLinksCoversDB = localityCaseFilesData.caseFiles[0].linksCovers;
+  // let localityID = localityCaseFilesData.id;
+  let caseFileNumber = number;
+  let caseFileID = id;
+  let caseFileNumberOfProvidences = numberOfProvidences;
+  let caseFileCourt = court;
+  let caseFileLinkCurrentCoverDB = linkCurrentCover;
+  let caseFileLinksCoversDB = linksCovers;
 
   let caseFileNumberSplitted = caseFileNumber.split("/");
   // divido el numero de expediente para pasar los datos necesarios al form para hacer la request
@@ -47,7 +48,7 @@ const obtainProvidences = async cookie => {
   let linkLastCourt;
 
   // request por el numero de expediente
-  let caseFileResponse = await initialRequest(cookie, num1, num2);
+  let caseFileResponse = await initialRequest(cookie, num1, num2, cbo);
 
   // se carga el body de la respuesta a la request con cheerio
   let $ = cheerio.load(caseFileResponse.body);
