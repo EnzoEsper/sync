@@ -1,2 +1,0 @@
-# sync
-Created with CodeSandbox
