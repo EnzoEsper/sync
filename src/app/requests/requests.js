@@ -1,9 +1,9 @@
 const request = require("request-promise");
 
 // Esta funcion tambien deberia recibir como parametro el campo cbocircunscripcion
-// initialRequest es la primera request que se hace a IURIX por un numero de expediente en particular, y de la respuesta que retorne
-// se van a extraer los links que hacen referencia a un organismo (estado) de dicho expediente.
-const initialRequest = async (cookie, num1, num2, cbo) => {
+// caseFileRequest es la primera request que se hace a IURIX por un numero de expediente en particular, y de la respuesta que retorne
+// se van a extraer los links de cada una de las caratulas que hacen referencia a un organismo (estado en particular) de dicho expediente.
+const caseFileRequest = async (cookie, num, anio, cbo) => {
   const caseFileResponse = await request({
     uri: "https://iol.juscorrientes.gov.ar:8443/iurix-online/QueryExped",
     method: "POST",
@@ -28,10 +28,10 @@ const initialRequest = async (cookie, num1, num2, cbo) => {
       Cookie: cookie
     },
     form: {
-      cbocircunscripcion: cbo, // 11- Alvear, 10- Capital, 111- Paso de la Patria Este numero es fijo, y se corresponde con el value del option del select(? RELACION LOCALIDAD-VALUE (HAY QUE ARMAR UNA ESTRUCTURA DE DEATOS QUE RELACIONE CADA LOCALIDAD CON EL NUMERO CORRESPONDIENTE)
+      cbocircunscripcion: cbo, // Se corresponde con el value de cada option del select. RELACION LOCALIDAD-VALUE.
       cmbOrganismo: "",
-      txtNumero: num1, // Primer numero del expediente
-      txtAnio: num2, // Segundo numero del expediente
+      txtNumero: num, // numero del expediente
+      txtAnio: anio, // anio del expediente
       txtCaratula: "",
       organismo: false,
       idinicial: null,
@@ -56,9 +56,11 @@ const initialRequest = async (cookie, num1, num2, cbo) => {
   return caseFileResponse;
 };
 
-const providencesRequest = async (cookie, urlLink) => {
+// providencesRequest es la request que se hace a IURIX accediendo al link de una caratula (organismo-numero) del expediente en particular
+// y de la respuesta que retorne se van a extraer los links que hacen referencia a las providencias de dicha caratula del expediente.
+const providencesRequest = async (cookie, coverLink) => {
   const providencesResponse = await request({
-    uri: urlLink,
+    uri: coverLink,
     method: "GET",
     headers: {
       Host: "iol.juscorrientes.gov.ar:8443",
@@ -84,6 +86,8 @@ const providencesRequest = async (cookie, urlLink) => {
   return providencesResponse;
 };
 
+// providenceContentRequest es la request que se hace a IURIX accediendo al link de una providencia del expediente en particular
+// y de la respuesta que retorne se va a extraer el contenido relacionado a dicha providencia del expediente.
 const providenceContentRequest = async (cookie, providenceLink) => {
   const providenceContentResponse = await request({
     uri: providenceLink,
@@ -112,7 +116,7 @@ const providenceContentRequest = async (cookie, providenceLink) => {
 };
 
 module.exports = {
-  initialRequest: initialRequest,
+  caseFileRequest: caseFileRequest,
   providencesRequest: providencesRequest,
   providenceContentRequest: providenceContentRequest
 };
