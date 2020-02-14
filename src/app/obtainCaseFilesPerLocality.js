@@ -21,11 +21,11 @@ const obtainCaseFilesPerLocality = async () => {
 
   const responseLocalities = await client.request(obtainLocalities);
   const localities = responseLocalities.jurisdiccion.localidades;
-  console.log(localities);
+  // console.log(localities);
 
-  localities.forEach(async locality => {
+  for (let i = 0; i < localities.length; i++) {
     const obtainLocality = `{
-      localidad(where: { id: "${locality.id}" }) {
+      localidad(where: { id: "${localities[i].id}" }) {
         expedientes {
           id
           numero
@@ -44,8 +44,8 @@ const obtainCaseFilesPerLocality = async () => {
 
     let caseFilesPerLocality = {};
     caseFilesPerLocality.caseFiles = [];
-    caseFilesPerLocality.name = locality.nombre;
-    caseFilesPerLocality.id = locality.id;
+    caseFilesPerLocality.name = localities[i].nombre;
+    caseFilesPerLocality.id = localities[i].id;
 
     const localityResponse = await client.request(obtainLocality);
 
@@ -60,16 +60,63 @@ const obtainCaseFilesPerLocality = async () => {
       });
     });
 
-    // caseFilesLocality.numberOfProvidences = response.localidad.expedientes.providencias.length;
-
     let caseFilesPerLocalityJSON = JSON.stringify(caseFilesPerLocality);
     fs.writeFileSync(
-      `${pathToCaseFilesAPI}/${locality.nombre}.json`,
+      `${pathToCaseFilesAPI}/${localities[i].nombre}.json`,
       caseFilesPerLocalityJSON
     );
-    //console.log(caseFilesLocality);
-  });
+  }
 };
 
+// obtainCaseFilesPerLocality();
 module.exports = obtainCaseFilesPerLocality;
 // client.request(query).then(data => console.log(JSON.stringify(data.localidad.expedientes, undefined, 2)))
+
+/* localities.forEach(async (locality) => {
+
+  const obtainLocality = `{
+    localidad(where: { id: "${locality.id}" }) {
+      expedientes {
+        id
+        numero
+        anio
+        linksCaratulas
+        linkCaratulaActual
+        organismo {
+          nombre
+        }
+        providencias {
+          id
+        }
+      }
+    }
+  }`;
+
+  let caseFilesPerLocality = {};
+  caseFilesPerLocality.caseFiles = [];
+  caseFilesPerLocality.name = locality.nombre;
+  caseFilesPerLocality.id = locality.id;
+ 
+  const localityResponse = await client.request(obtainLocality);
+  
+  localityResponse.localidad.expedientes.forEach(exp => {
+    caseFilesPerLocality.caseFiles.push({
+      number: exp.numero.toString() + "/" + exp.anio.toString(),
+      id: exp.id,
+      numberOfProvidences: exp.providencias.length,
+      court: exp.organismo.nombre,
+      linkCurrentCover: exp.linkCaratulaActual,
+      linksCovers: exp.linksCaratulas
+    });
+  });
+  
+  // caseFilesLocality.numberOfProvidences = response.localidad.expedientes.providencias.length;
+
+  let caseFilesPerLocalityJSON = JSON.stringify(caseFilesPerLocality);
+  fs.writeFileSync(
+    `${pathToCaseFilesAPI}/${locality.nombre}.json`,
+    caseFilesPerLocalityJSON
+  );
+  //console.log(caseFilesLocality);
+ 
+}); */
