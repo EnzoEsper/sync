@@ -2,7 +2,7 @@ const requestIURIX = require("./requestIURIX");
 const obtainCookieIURIX = require("./obtainCookieIURIX");
 const downloadFiles = require("./downloadFiles");
 const filesToJSON = require("./filesToJSON");
-const obtainCaseFilesPerLocalityAPI = require("./obtainCaseFilesPerLocality");
+const obtainCaseFilesPerLocality = require("./obtainCaseFilesPerLocality");
 const obtainMatches = require("./obtainMatches");
 const processCaseFiles = require("./processCaseFiles");
 const fs = require("fs");
@@ -50,7 +50,7 @@ const path = require("path");
 
       // Once parsed the files proceed to request all the casefiles from all localities from the API for obtain the matches
       console.log("obtaining all the case files from the API");
-      await obtainCaseFilesPerLocalityAPI();
+      await obtainCaseFilesPerLocality();
 
       // Matching the casefiles requested from the API with the casefiles asociated with a notification
       console.log("obtaining matches between casefiles");
